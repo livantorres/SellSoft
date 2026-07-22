@@ -11,7 +11,7 @@ class LocationController extends Controller
 
     public function __construct()
     {
-        $this->db = Database::getInstance()->getConnection();
+        $this->db = Database::getInstance()->getPdo();
     }
 
     public function getDepartamentos()
