@@ -28,7 +28,7 @@
                                     <td><?= htmlspecialchars($product['id']) ?></td>
                                     <td>
                                         <?php if (!empty($product['imagen_principal'])): ?>
-                                            <img src="/<?= htmlspecialchars($product['imagen_principal']) ?>" alt="Img" width="40" style="border-radius: 4px; object-fit: cover; aspect-ratio: 1/1;">
+                                            <img src="/<?= htmlspecialchars($product['imagen_principal']) ?>" alt="Img" width="40" style="border-radius: 4px; object-fit: cover; aspect-ratio: 1/1; cursor: pointer;" onclick="viewProductGallery(<?= $product['id'] ?>, '<?= htmlspecialchars($product['nombre'], ENT_QUOTES) ?>')">
                                         <?php else: ?>
                                             <div style="width: 40px; height: 40px; background: var(--color-surface-3); border-radius: 4px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted);">
                                                 <i class="fas fa-image"></i>
@@ -208,6 +208,33 @@
             <button type="submit" class="btn btn-primary-app px-4"><i class="fas fa-save me-2"></i> <?= \SellSoft\Helpers\Lang::get('common.save') ?></button>
           </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Gallery Carousel -->
+<div class="modal fade" id="galleryCarouselModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-transparent border-0 shadow-none">
+      <div class="modal-header border-0 pb-2">
+        <h5 class="modal-title text-white fw-bold text-shadow" id="galleryCarouselTitle" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></h5>
+        <button type="button" class="btn-close btn-close-white shadow-sm" data-bs-dismiss="modal" aria-label="Close" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner" id="carouselInner">
+            <!-- Images here -->
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -456,6 +483,36 @@ function previewFull(src) {
         background: "transparent",
         backdrop: "rgba(0,0,0,0.85)"
     });
+}
+
+function viewProductGallery(id, name) {
+    document.getElementById('galleryCarouselTitle').innerText = name;
+    const inner = document.getElementById('carouselInner');
+    inner.innerHTML = '<div class="text-center text-white my-5"><div class="spinner-border text-light" role="status"></div></div>';
+    
+    var modal = new bootstrap.Modal(document.getElementById('galleryCarouselModal'));
+    modal.show();
+    
+    fetch('/dashboard/products/gallery?id=' + id)
+        .then(res => res.json())
+        .then(data => {
+            inner.innerHTML = '';
+            if(data.success && data.gallery && data.gallery.length > 0) {
+                data.gallery.forEach((img, i) => {
+                    const active = i === 0 ? 'active' : '';
+                    inner.innerHTML += `
+                        <div class="carousel-item ${active}">
+                            <img src="/${img.url_imagen}" class="d-block w-100 rounded shadow" style="max-height: 80vh; object-fit: contain;">
+                        </div>
+                    `;
+                });
+            } else {
+                inner.innerHTML = '<div class="text-center text-white my-5"><h4>No hay imágenes</h4></div>';
+            }
+        })
+        .catch(err => {
+            inner.innerHTML = '<div class="text-center text-white my-5"><h4>Error cargando galería</h4></div>';
+        });
 }
 
 </script>
