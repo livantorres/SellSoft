@@ -31,7 +31,17 @@ class ProviderController extends Controller
 
     public function store()
     {
-        $data = $_POST;
+        $data = [
+            'nombre' => $_POST['name'] ?? '',
+            'tipo_documento' => $_POST['tipo_documento'] ?? 'NIT',
+            'nit' => $_POST['nit'] ?? null,
+            'correo' => $_POST['email'] ?? null,
+            'telefono' => $_POST['phone'] ?? null,
+            'direccion' => $_POST['address'] ?? null,
+            'ciudad_id' => $_POST['ciudad_id'] ?? null,
+            'is_cliente' => isset($_POST['is_cliente']) ? 1 : 0,
+            'activo' => $_POST['status'] ?? 1
+        ];
         
         // Handle file upload
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
@@ -42,8 +52,6 @@ class ProviderController extends Controller
             move_uploaded_file($_FILES['imagen']['tmp_name'], $dest . $filename);
             $data['imagen'] = '/uploads/providers/' . $filename;
         }
-
-        $data['is_cliente'] = isset($_POST['is_cliente']) ? 1 : 0;
         
         $provId = $this->providerModel->create($data);
         if ($provId) {
@@ -61,10 +69,17 @@ class ProviderController extends Controller
         $id = $_POST['id'] ?? null;
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID is missing']); return; }
         
-        $data = $_POST;
-        if (empty($data)) {
-            $data = json_decode(file_get_contents('php://input'), true) ?? [];
-        }
+        $data = [
+            'nombre' => $_POST['name'] ?? '',
+            'tipo_documento' => $_POST['tipo_documento'] ?? 'NIT',
+            'nit' => $_POST['nit'] ?? null,
+            'correo' => $_POST['email'] ?? null,
+            'telefono' => $_POST['phone'] ?? null,
+            'direccion' => $_POST['address'] ?? null,
+            'ciudad_id' => $_POST['ciudad_id'] ?? null,
+            'is_cliente' => isset($_POST['is_cliente']) ? 1 : 0,
+            'activo' => $_POST['status'] ?? 1
+        ];
         
         // Handle file upload
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
@@ -75,8 +90,6 @@ class ProviderController extends Controller
             move_uploaded_file($_FILES['imagen']['tmp_name'], $dest . $filename);
             $data['imagen'] = '/uploads/providers/' . $filename;
         }
-
-        $data['is_cliente'] = isset($_POST['is_cliente']) ? 1 : 0;
 
         if ($this->providerModel->update($id, $data)) {
             if ($data['is_cliente']) {
@@ -106,31 +119,39 @@ class ProviderController extends Controller
         $stmt->execute([$providerId]);
         $clienteId = $stmt->fetchColumn();
         
-        $nombre = $data['name'] ?? $data['nombre'] ?? '';
+        $nombre = $data['nombre'] ?? '';
+        $ciudad_nombre = '';
+        if (!empty($data['ciudad_id'])) {
+            $stmtC = $db->prepare("SELECT nombre FROM ciudades WHERE id = ?");
+            $stmtC->execute([$data['ciudad_id']]);
+            $ciudad_nombre = $stmtC->fetchColumn();
+        }
         
         if ($clienteId) {
             // Update
-            $update = $db->prepare("UPDATE clientes SET nombre = ?, tipo_doc = ?, numero_doc = ?, correo = ?, telefono = ?, direccion = ? WHERE id = ?");
+            $update = $db->prepare("UPDATE clientes SET nombre = ?, tipo_doc = ?, numero_doc = ?, correo = ?, telefono = ?, direccion = ?, ciudad = ? WHERE id = ?");
             $update->execute([
                 $nombre,
                 $tipoDoc,
                 $data['nit'] ?? '',
-                $data['email'] ?? $data['correo'] ?? '',
-                $data['phone'] ?? $data['telefono'] ?? '',
-                $data['address'] ?? $data['direccion'] ?? '',
+                $data['correo'] ?? '',
+                $data['telefono'] ?? '',
+                $data['direccion'] ?? '',
+                $ciudad_nombre,
                 $clienteId
             ]);
         } else {
             // Insert
-            $insert = $db->prepare("INSERT INTO clientes (proveedor_id, nombre, tipo_doc, numero_doc, correo, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $insert = $db->prepare("INSERT INTO clientes (proveedor_id, nombre, tipo_doc, numero_doc, correo, telefono, direccion, ciudad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
             $insert->execute([
                 $providerId,
                 $nombre,
                 $tipoDoc,
                 $data['nit'] ?? '',
-                $data['email'] ?? $data['correo'] ?? '',
-                $data['phone'] ?? $data['telefono'] ?? '',
-                $data['address'] ?? $data['direccion'] ?? ''
+                $data['correo'] ?? '',
+                $data['telefono'] ?? '',
+                $data['direccion'] ?? '',
+                $ciudad_nombre
             ]);
         }
     }
