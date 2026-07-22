@@ -120,7 +120,7 @@ class ClientController extends Controller
         
         if ($proveedorId) {
             // Update
-            $update = $db->prepare("UPDATE proveedores SET nombre = ?, tipo_documento = ?, nit = ?, correo = ?, telefono = ?, direccion = ?, ciudad_id = ? WHERE id = ?");
+            $update = $db->prepare("UPDATE proveedores SET nombre = ?, tipo_documento = ?, nit = ?, correo = ?, telefono = ?, direccion = ?, ciudad_id = ?, is_cliente = 1 WHERE id = ?");
             $update->execute([
                 $data['nombre'] ?? '',
                 $tipoDoc,

@@ -129,7 +129,7 @@ class ProviderController extends Controller
         
         if ($clienteId) {
             // Update
-            $update = $db->prepare("UPDATE clientes SET nombre = ?, tipo_doc = ?, numero_doc = ?, correo = ?, telefono = ?, direccion = ?, ciudad = ?, ciudad_id = ? WHERE id = ?");
+            $update = $db->prepare("UPDATE clientes SET nombre = ?, tipo_doc = ?, numero_doc = ?, correo = ?, telefono = ?, direccion = ?, ciudad = ?, ciudad_id = ?, is_proveedor = 1 WHERE id = ?");
             $update->execute([
                 $nombre,
                 $tipoDoc,
@@ -143,7 +143,7 @@ class ProviderController extends Controller
             ]);
         } else {
             // Insert
-            $insert = $db->prepare("INSERT INTO clientes (proveedor_id, nombre, tipo_doc, numero_doc, correo, telefono, direccion, ciudad, ciudad_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $insert = $db->prepare("INSERT INTO clientes (proveedor_id, nombre, tipo_doc, numero_doc, correo, telefono, direccion, ciudad, ciudad_id, is_proveedor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)");
             $insert->execute([
                 $providerId,
                 $nombre,
