@@ -38,6 +38,11 @@ $router->group(['prefix' => '/dashboard', 'middleware' => [AuthMiddleware::class
     $r->post('/providers/update',  [\SellSoft\Controllers\ProviderController::class, 'update']);
     $r->post('/providers/delete',  [\SellSoft\Controllers\ProviderController::class, 'delete']);
 
+    $r->get('/clients',          [\SellSoft\Controllers\ClientController::class, 'index']);
+    $r->post('/clients',         [\SellSoft\Controllers\ClientController::class, 'store']);
+    $r->post('/clients/update',  [\SellSoft\Controllers\ClientController::class, 'update']);
+    $r->post('/clients/delete',  [\SellSoft\Controllers\ClientController::class, 'delete']);
+
     $r->get('/products',          [\SellSoft\Controllers\ProductController::class, 'index']);
     $r->get('/products/next-sku',  [\SellSoft\Controllers\ProductController::class, 'nextSku']);
     $r->get('/products/create',   [\SellSoft\Controllers\ProductController::class, 'create']);
