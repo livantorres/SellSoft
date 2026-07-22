@@ -186,7 +186,7 @@
                                       <small class="text-muted" style="font-size: 0.7rem">La primera imagen será la principal</small>
                                   </div>
                                   <!-- File input oculto -->
-                                  <input type="file" name="galeria[]" id="prodGaleria" class="d-none" multiple accept="image/*" onchange="previewImages()">
+                                  <input type="file" name="galeria[]" id="prodGaleria" class="d-none" multiple accept="image/*" onchange="handleFiles(this)">
                               </div>
                               
                               <div class="gallery-preview row g-2" id="galleryPreview">
@@ -209,12 +209,16 @@
 </div>
 
 <script>
+let productImages = [];
+let sortableGallery = null;
+
 function resetProductForm() {
     document.getElementById('productForm').reset();
     $('#productForm select').val('').trigger('change');
     document.getElementById('productId').value = '';
     document.getElementById('productModalLabel').innerText = 'Crear Producto';
-    document.getElementById('galleryPreview').innerHTML = '';
+    productImages = [];
+    renderGallery();
 }
 
 function editProduct(prod) {
@@ -251,37 +255,70 @@ function calcPrice() {
     document.getElementById('prodVenta').value = venta.toFixed(2);
 }
 
-function previewImages() {
+function handleFiles(input) {
+    const files = input.files;
+    if (files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+            productImages.push(files[i]);
+        }
+        renderGallery();
+    }
+    input.value = "";
+}
+
+function renderGallery() {
     const preview = document.getElementById('galleryPreview');
     preview.innerHTML = '';
-    const files = document.getElementById('prodGaleria').files;
     
-    if (files.length > 0) {
-        Array.from(files).forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const col = document.createElement('div');
-                col.className = 'col-4 col-md-4 position-relative';
-                
-                const badge = index === 0 ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.6rem">Ppal</span>' : '';
-                
-                col.innerHTML = `
-                    <div class="border rounded overflow-hidden shadow-sm" style="aspect-ratio: 1/1;">
-                        ${badge}
-                        <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover;">
-                    </div>
-                `;
-                preview.appendChild(col);
+    productImages.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const col = document.createElement('div');
+            col.className = 'col-4 col-md-4 position-relative gallery-item';
+            col.dataset.index = index;
+            
+            const badge = index === 0 ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.6rem; z-index: 2;">Ppal</span>' : '';
+            const delBtn = `<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 p-0 rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 20px; height: 20px; z-index: 2;" onclick="removeImage(${index})" title="Eliminar"><i class="fas fa-times" style="font-size: 0.6rem;"></i></button>`;
+            
+            col.innerHTML = `
+                <div class="border rounded overflow-hidden shadow-sm position-relative drag-handle" style="aspect-ratio: 1/1; cursor: grab;">
+                    ${badge}
+                    ${delBtn}
+                    <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover;">
+                </div>
+            `;
+            preview.appendChild(col);
+        }
+        reader.readAsDataURL(file);
+    });
+    
+    if (!sortableGallery) {
+        sortableGallery = new Sortable(document.getElementById('galleryPreview'), {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'bg-light',
+            onEnd: function (evt) {
+                const item = productImages.splice(evt.oldIndex, 1)[0];
+                productImages.splice(evt.newIndex, 0, item);
+                renderGallery();
             }
-            reader.readAsDataURL(file);
         });
     }
+}
+
+function removeImage(index) {
+    productImages.splice(index, 1);
+    renderGallery();
 }
 
 document.getElementById('productForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const form = e.target;
     const formData = new FormData(form);
+    formData.delete('galeria[]');
+    productImages.forEach(file => {
+        formData.append('galeria[]', file);
+    });
     const id = formData.get('id');
     const endpoint = id ? '/dashboard/products/update' : '/dashboard/products';
     

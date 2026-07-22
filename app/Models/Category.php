@@ -31,6 +31,7 @@ class Category
         $stmt = $this->db->prepare("INSERT INTO categorias (nombre, abreviatura, slug, descripcion, activo) VALUES (:nombre, :abreviatura, :slug, :descripcion, :activo)");
         return $stmt->execute([
             ':nombre' => $data['nombre'] ?? '',
+            ':abreviatura' => $data['abreviatura'] ?? null,
             ':slug' => $data['slug'] ?? '',
             ':descripcion' => $data['descripcion'] ?? null,
             ':activo' => $data['activo'] ?? 1
@@ -41,6 +42,7 @@ class Category
         $stmt = $this->db->prepare("UPDATE categorias SET nombre = :nombre, abreviatura = :abreviatura, slug = :slug, descripcion = :descripcion, activo = :activo WHERE id = :id");
         return $stmt->execute([
             ':nombre' => $data['nombre'] ?? '',
+            ':abreviatura' => $data['abreviatura'] ?? null,
             ':slug' => $data['slug'] ?? '',
             ':descripcion' => $data['descripcion'] ?? null,
             ':activo' => $data['activo'] ?? 1,
