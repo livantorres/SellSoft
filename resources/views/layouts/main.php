@@ -20,6 +20,8 @@ use SellSoft\Helpers\Session;
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/app.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="app-wrapper">
@@ -150,6 +152,29 @@ use SellSoft\Helpers\Session;
     </main>
 </div>
 <div id="sidebar-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;backdrop-filter:blur(4px)" onclick="closeMobileSidebar()" aria-hidden="true"></div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    function initSelect2() {
+        $('select:not([name$=\'_length\'])').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('.modal.show').length ? $('.modal.show') : $(document.body)
+        });
+    }
+    initSelect2();
+    // Re-init on modal shown
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('select').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $(this)
+        });
+    });
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>

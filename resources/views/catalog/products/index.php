@@ -211,6 +211,7 @@
 <script>
 function resetProductForm() {
     document.getElementById('productForm').reset();
+    $('#productForm select').val('').trigger('change');
     document.getElementById('productId').value = '';
     document.getElementById('productModalLabel').innerText = 'Crear Producto';
     document.getElementById('galleryPreview').innerHTML = '';
@@ -223,9 +224,9 @@ function editProduct(prod) {
     document.getElementById('prodNombre').value = prod.nombre || '';
     document.getElementById('prodSku').value = prod.codigo_sku || '';
     document.getElementById('prodDesc').value = prod.descripcion || '';
-    document.getElementById('prodCat').value = prod.categoria_id || '';
-    document.getElementById('prodBrand').value = prod.marca_id || '';
-    document.getElementById('prodProv').value = prod.proveedor_id || '';
+    $('#prodCat').val(prod.categoria_id || '').trigger('change');
+    $('#prodBrand').val(prod.marca_id || '').trigger('change');
+    $('#prodProv').val(prod.proveedor_id || '').trigger('change');
     document.getElementById('prodCompra').value = prod.precio_compra || '0.00';
     document.getElementById('prodVenta').value = prod.precio_venta || '0.00';
     document.getElementById('prodStock').value = prod.stock_inicial || '0';

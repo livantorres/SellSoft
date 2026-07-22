@@ -70,8 +70,6 @@ class ProductController extends Controller
         }
     }
 
-    }
-
     public function edit($id)
     {
         $product = $this->productModel->getById($id);
@@ -120,8 +118,6 @@ class ProductController extends Controller
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
         }
-    }
-
     }
 
     public function delete()
