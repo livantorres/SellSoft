@@ -22,6 +22,29 @@ use SellSoft\Helpers\Session;
     <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/app.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    function initSelect2() {
+        $('select:not([name$=\'_length\'])').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $('.modal.show').length ? $('.modal.show') : $(document.body)
+        });
+    }
+    initSelect2();
+    // Re-init on modal shown
+    $('.modal').on('shown.bs.modal', function () {
+        $(this).find('select').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            dropdownParent: $(this)
+        });
+    });
+});
+</script>
 </head>
 <body>
 <div class="app-wrapper">
@@ -153,8 +176,6 @@ use SellSoft\Helpers\Session;
 </div>
 <div id="sidebar-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;backdrop-filter:blur(4px)" onclick="closeMobileSidebar()" aria-hidden="true"></div>
 
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(document).ready(function() {
     function initSelect2() {
