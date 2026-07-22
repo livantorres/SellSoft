@@ -129,7 +129,7 @@ class ProviderController extends Controller
         
         if ($clienteId) {
             // Update
-            $update = $db->prepare("UPDATE clientes SET nombre = ?, tipo_doc = ?, numero_doc = ?, correo = ?, telefono = ?, direccion = ?, ciudad = ? WHERE id = ?");
+            $update = $db->prepare("UPDATE clientes SET nombre = ?, tipo_doc = ?, numero_doc = ?, correo = ?, telefono = ?, direccion = ?, ciudad = ?, ciudad_id = ? WHERE id = ?");
             $update->execute([
                 $nombre,
                 $tipoDoc,
@@ -138,11 +138,12 @@ class ProviderController extends Controller
                 $data['telefono'] ?? '',
                 $data['direccion'] ?? '',
                 $ciudad_nombre,
+                !empty($data['ciudad_id']) ? $data['ciudad_id'] : null,
                 $clienteId
             ]);
         } else {
             // Insert
-            $insert = $db->prepare("INSERT INTO clientes (proveedor_id, nombre, tipo_doc, numero_doc, correo, telefono, direccion, ciudad) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $insert = $db->prepare("INSERT INTO clientes (proveedor_id, nombre, tipo_doc, numero_doc, correo, telefono, direccion, ciudad, ciudad_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $insert->execute([
                 $providerId,
                 $nombre,
@@ -151,7 +152,8 @@ class ProviderController extends Controller
                 $data['correo'] ?? '',
                 $data['telefono'] ?? '',
                 $data['direccion'] ?? '',
-                $ciudad_nombre
+                $ciudad_nombre,
+                !empty($data['ciudad_id']) ? $data['ciudad_id'] : null
             ]);
         }
     }
