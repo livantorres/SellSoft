@@ -173,7 +173,13 @@ async function updateTableDynamic() {
         const doc = parser.parseFromString(html, 'text/html');
         const newTbody = doc.querySelector('.data-table tbody');
         if (newTbody) {
+            if ($.fn.DataTable.isDataTable('.data-table')) {
+                $('.data-table').DataTable().destroy();
+            }
             document.querySelector('.data-table tbody').innerHTML = newTbody.innerHTML;
+            if (window.initDataTables) {
+                window.initDataTables();
+            }
         }
         const openModal = document.querySelector('.modal.show');
         if (openModal) {

@@ -25,6 +25,29 @@ use SellSoft\Helpers\Session;
 
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+<script>
+$(document).ready(function() {
+    window.initDataTables = function() {
+        if ($.fn.DataTable.isDataTable('.data-table')) {
+            $('.data-table').DataTable().destroy();
+        }
+        $('.data-table').DataTable({
+            language: { url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json' },
+            pageLength: 10,
+            responsive: true,
+            stateSave: true // Guarda en que pagina y busqueda ibas
+        });
+    };
+    window.initDataTables();
+});
+</script>
+
 <script>
 $(document).ready(function() {
     function initSelect2() {
