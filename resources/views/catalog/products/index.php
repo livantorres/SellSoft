@@ -83,20 +83,7 @@
                       <div class="card mb-3 border-0 bg-transparent">
                           <div class="card-body p-0">
                               <h6 class="fw-bold mb-3 text-accent">Información Básica</h6>
-                              <div class="row mb-3">
-                                  <div class="col-md-8">
-                                      <label class="form-label text-sm fw-semibold"><?= \SellSoft\Helpers\Lang::get('products.name') ?> *</label>
-                                      <input type="text" name="nombre" id="prodNombre" class="form-control" required>
-                                  </div>
-                                  <div class="col-md-4">
-                                      <label class="form-label text-sm fw-semibold"><?= \SellSoft\Helpers\Lang::get('products.sku') ?></label>
-                                      <input type="text" name="codigo_sku" id="prodSku" class="form-control" placeholder="Generado automático">
-                                  </div>
-                              </div>
-                              <div class="mb-3">
-                                  <label class="form-label text-sm fw-semibold"><?= \SellSoft\Helpers\Lang::get('products.description') ?></label>
-                                  <textarea name="descripcion" id="prodDesc" class="form-control" rows="3"></textarea>
-                              </div>
+
                               <div class="row mb-3">
                                   <div class="col-md-4">
                                       <label class="form-label text-sm fw-semibold"><?= \SellSoft\Helpers\Lang::get('products.category') ?></label>
@@ -120,6 +107,23 @@
                                       </select>
                                   </div>
                               </div>
+
+
+                              <div class="row mb-3">
+                                  <div class="col-md-8">
+                                      <label class="form-label text-sm fw-semibold"><?= \SellSoft\Helpers\Lang::get('products.name') ?> *</label>
+                                      <input type="text" name="nombre" id="prodNombre" class="form-control" required>
+                                  </div>
+                                  <div class="col-md-4">
+                                      <label class="form-label text-sm fw-semibold"><?= \SellSoft\Helpers\Lang::get('products.sku') ?></label>
+                                      <input type="text" name="codigo_sku" id="prodSku" class="form-control" placeholder="Generado automático">
+                                  </div>
+                              </div>
+                              <div class="mb-3">
+                                  <label class="form-label text-sm fw-semibold"><?= \SellSoft\Helpers\Lang::get('products.description') ?></label>
+                                  <textarea name="descripcion" id="prodDesc" class="form-control" rows="3"></textarea>
+                              </div>
+
                           </div>
                       </div>
                       
@@ -284,7 +288,8 @@ function renderGallery() {
                 <div class="border rounded overflow-hidden shadow-sm position-relative drag-handle" style="aspect-ratio: 1/1; cursor: grab;">
                     ${badge}
                     ${delBtn}
-                    <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover;">
+                    <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover;" onclick="previewFull('${e.target.result}')">
+     <div class="position-absolute bottom-0 end-0 m-1 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center opacity-75" style="width: 20px; height: 20px; pointer-events: none;"><i class="fas fa-search-plus" style="font-size: 0.6rem;"></i></div>
                 </div>
             `;
             preview.appendChild(col);
@@ -407,5 +412,19 @@ $(document).ready(function() {
         }
     });
 });
+
+
+function previewFull(src) {
+    Swal.fire({
+        imageUrl: src,
+        imageAlt: "Vista Previa",
+        showConfirmButton: false,
+        showCloseButton: true,
+        width: "auto",
+        padding: "1rem",
+        background: "transparent",
+        backdrop: "rgba(0,0,0,0.85)"
+    });
+}
 
 </script>

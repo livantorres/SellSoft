@@ -16,6 +16,7 @@ return [
     'sales_history' => 'Historial de Ventas',
     'products' => 'Productos',
     'categories' => 'Categorías',
+    'brands' => 'Marcas / Tipos',
     'offers' => 'Ofertas y Descuentos',
     'stock_movements' => 'Movimientos de Stock',
     'warehouses' => 'Sedes / Bodegas',

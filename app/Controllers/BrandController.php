@@ -27,7 +27,7 @@ class BrandController extends Controller
 
     public function store()
     {
-        $data = ['nombre' => $_POST['name'] ?? '', 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
+        $data = ['nombre' => $_POST['name'] ?? '', 'abreviatura' => strtoupper(trim($_POST['abreviatura'] ?? '')), 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
         
         if ($this->brandModel->create($data)) {
             echo json_encode(['success' => true, 'message' => Lang::get('messages.created_successfully')]);
@@ -40,9 +40,9 @@ class BrandController extends Controller
     {
         $id = $_POST['id'] ?? null;
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID is missing']); return; }
-        $data = ['nombre' => $_POST['name'] ?? '', 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
+        $data = ['nombre' => $_POST['name'] ?? '', 'abreviatura' => strtoupper(trim($_POST['abreviatura'] ?? '')), 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
         if (empty($data)) {
-            $data = json_decode(file_get_contents('php://input'), true) ?? []; if(isset($data['name'])) { $data = ['nombre' => $data['name'], 'descripcion' => $data['description'] ?? null, 'activo' => $data['status'] ?? 1]; }
+            $data = json_decode(file_get_contents('php://input'), true) ?? []; if(isset($data['name'])) { $data = ['nombre' => $data['name'], 'abreviatura' => strtoupper(trim($data['abreviatura'] ?? '')), 'descripcion' => $data['description'] ?? null, 'activo' => $data['status'] ?? 1]; }
         }
 
         if ($this->brandModel->update($id, $data)) {

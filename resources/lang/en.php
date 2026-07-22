@@ -16,6 +16,7 @@ return [
     'sales_history' => 'Sales History',
     'products' => 'Products',
     'categories' => 'Categories',
+    'brands' => 'Brands / Types',
     'offers' => 'Offers & Discounts',
     'stock_movements' => 'Stock Movements',
     'warehouses' => 'Warehouses',
