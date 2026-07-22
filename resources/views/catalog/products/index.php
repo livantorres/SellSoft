@@ -214,23 +214,23 @@
 
 <!-- Modal Gallery Carousel -->
 <div class="modal fade" id="galleryCarouselModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content bg-transparent border-0 shadow-none">
-      <div class="modal-header border-0 pb-2">
-        <h5 class="modal-title text-white fw-bold text-shadow" id="galleryCarouselTitle" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></h5>
-        <button type="button" class="btn-close btn-close-white shadow-sm" data-bs-dismiss="modal" aria-label="Close" style="filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));"></button>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="background-color: var(--color-surface);">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold" id="galleryCarouselTitle" style="color: var(--color-text);"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body p-0">
+      <div class="modal-body p-3">
         <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
-          <div class="carousel-inner" id="carouselInner">
+          <div class="carousel-inner rounded" id="carouselInner">
             <!-- Images here -->
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
             <span class="visually-hidden">Anterior</span>
           </button>
           <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
             <span class="visually-hidden">Siguiente</span>
           </button>
         </div>
@@ -501,17 +501,17 @@ function viewProductGallery(id, name) {
                 data.gallery.forEach((img, i) => {
                     const active = i === 0 ? 'active' : '';
                     inner.innerHTML += `
-                        <div class="carousel-item ${active}">
-                            <img src="/${img.url_imagen}" class="d-block w-100 rounded shadow" style="max-height: 80vh; object-fit: contain;">
+                        <div class="carousel-item ${active} bg-light">
+                            <img src="/${img.url_imagen}" class="d-block mx-auto" style="height: 400px; width: auto; max-width: 100%; object-fit: contain;">
                         </div>
                     `;
                 });
             } else {
-                inner.innerHTML = '<div class="text-center text-white my-5"><h4>No hay imágenes</h4></div>';
+                inner.innerHTML = '<div class="text-center my-5"><h4 style="color: var(--color-text-muted);">No hay imágenes</h4></div>';
             }
         })
         .catch(err => {
-            inner.innerHTML = '<div class="text-center text-white my-5"><h4>Error cargando galería</h4></div>';
+            inner.innerHTML = '<div class="text-center my-5"><h4 style="color: var(--color-text-muted);">Error cargando galería</h4></div>';
         });
 }
 
