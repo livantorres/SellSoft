@@ -63,9 +63,16 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-              <div class="mb-3">
-                  <label for="categoryName" class="form-label"><?= \SellSoft\Helpers\Lang::get('common.name') ?></label>
-                  <input type="text" class="form-control" id="categoryName" name="name" required>
+              
+              <div class="mb-3 row">
+                  <div class="col-md-8">
+                      <label for="categoryName" class="form-label"><?= \SellSoft\Helpers\Lang::get('common.name') ?> *</label>
+                      <input type="text" class="form-control" id="categoryName" name="name" required>
+                  </div>
+                  <div class="col-md-4">
+                      <label for="categoryAbrev" class="form-label">Abreviatura</label>
+                      <input type="text" class="form-control text-uppercase" id="categoryAbrev" name="abreviatura" placeholder="Ej: ZAP" maxlength="10">
+                  </div>
               </div>
               <div class="mb-3">
                   <label for="categoryDescription" class="form-label"><?= \SellSoft\Helpers\Lang::get('common.description') ?></label>

@@ -4,6 +4,7 @@ return [
     'dashboard' => 'Dashboard',
     'sales' => 'Sales',
     'catalog' => 'Catalog',
+    'catalog.products.title' => 'Products Catalog',
     'inventory' => 'Inventory',
     'people' => 'People',
     'analytics' => 'Analytics',

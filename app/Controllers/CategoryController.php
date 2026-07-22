@@ -28,7 +28,7 @@ class CategoryController extends Controller
 
     public function store()
     {
-        $data = ['nombre' => $_POST['name'] ?? '', 'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['name'] ?? ''))), 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
+        $data = ['nombre' => $_POST['name'] ?? '', 'abreviatura' => strtoupper(trim($_POST['abreviatura'] ?? '')), 'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['name'] ?? ''))), 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
         
         if ($this->categoryModel->create($data)) {
             echo json_encode(['success' => true, 'message' => Lang::get('messages.created_successfully')]);
@@ -42,10 +42,10 @@ class CategoryController extends Controller
         $id = $_POST['id'] ?? null;
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID is missing']); return; }
         // Parse request payload
-        $data = ['nombre' => $_POST['name'] ?? '', 'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['name'] ?? ''))), 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
+        $data = ['nombre' => $_POST['name'] ?? '', 'abreviatura' => strtoupper(trim($_POST['abreviatura'] ?? '')), 'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $_POST['name'] ?? ''))), 'descripcion' => $_POST['description'] ?? null, 'activo' => $_POST['status'] ?? 1];
         // If raw json was sent via PUT/PATCH:
         if (empty($data)) {
-            $data = json_decode(file_get_contents('php://input'), true) ?? []; if(isset($data['name'])) { $data = ['nombre' => $data['name'], 'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $data['name']))), 'descripcion' => $data['description'] ?? null, 'activo' => $data['status'] ?? 1]; }
+            $data = json_decode(file_get_contents('php://input'), true) ?? []; if(isset($data['name'])) { $data = ['nombre' => $data['name'], 'abreviatura' => strtoupper(trim($data['abreviatura'] ?? '')), 'slug' => strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $data['name']))), 'descripcion' => $data['description'] ?? null, 'activo' => $data['status'] ?? 1]; }
         }
 
         if ($this->categoryModel->update($id, $data)) {

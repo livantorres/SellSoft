@@ -349,4 +349,26 @@ function deleteProduct(id) {
         }
     });
 }
+
+// Evento para auto generar SKU al seleccionar categoria
+$(document).ready(function() {
+    $('#prodCat').on('change', async function() {
+        const catId = $(this).val();
+        const skuInput = document.getElementById('prodSku');
+        
+        // Solo auto-generar si estamos creando un nuevo producto y el SKU esta vacio
+        if (catId && !document.getElementById('productId').value && !skuInput.value) {
+            try {
+                const res = await fetch('/dashboard/products/next-sku?categoria_id=' + catId);
+                const data = await res.json();
+                if (data.success && data.sku) {
+                    skuInput.value = data.sku;
+                }
+            } catch(e) {
+                console.error('Error fetching next SKU', e);
+            }
+        }
+    });
+});
+
 </script>

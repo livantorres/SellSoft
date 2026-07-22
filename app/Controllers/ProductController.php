@@ -176,4 +176,44 @@ class ProductController extends Controller
         return $urls;
     }
 
+
+    public function nextSku()
+    {
+        $catId = $_GET['categoria_id'] ?? null;
+        if (!$catId) {
+            echo json_encode(['success' => false, 'message' => 'Missing category ID']);
+            exit;
+        }
+        
+        $catModel = new \SellSoft\Models\Category();
+        $cat = $catModel->getById($catId);
+        
+        if (!$cat || empty($cat['abreviatura'])) {
+            echo json_encode(['success' => false, 'message' => 'Category has no abbreviation']);
+            exit;
+        }
+        
+        $abrev = strtoupper(trim($cat['abreviatura']));
+        
+        // Find highest SKU starting with this abbreviation
+        $db = \SellSoft\Core\Database::getInstance()->getPdo();
+        $stmt = $db->prepare("SELECT codigo_sku FROM productos WHERE codigo_sku LIKE :prefix ORDER BY id DESC LIMIT 1");
+        $stmt->execute([':prefix' => $abrev . '-\%']);
+        $last = $stmt->fetch(\PDO::FETCH_ASSOC);
+        
+        $nextNum = 1;
+        if ($last && !empty($last['codigo_sku'])) {
+            $parts = explode('-', $last['codigo_sku']);
+            if (count($parts) >= 2) {
+                $lastNum = (int)end($parts);
+                $nextNum = $lastNum + 1;
+            }
+        }
+        
+        $newSku = $abrev . '-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+        
+        echo json_encode(['success' => true, 'sku' => $newSku]);
+        exit;
+    }
+
 }

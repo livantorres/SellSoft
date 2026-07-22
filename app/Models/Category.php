@@ -28,7 +28,7 @@ class Category
     }
 
     public function create($data) {
-        $stmt = $this->db->prepare("INSERT INTO categorias (nombre, slug, descripcion, activo) VALUES (:nombre, :slug, :descripcion, :activo)");
+        $stmt = $this->db->prepare("INSERT INTO categorias (nombre, abreviatura, slug, descripcion, activo) VALUES (:nombre, :abreviatura, :slug, :descripcion, :activo)");
         return $stmt->execute([
             ':nombre' => $data['nombre'] ?? '',
             ':slug' => $data['slug'] ?? '',
@@ -38,7 +38,7 @@ class Category
     }
 
     public function update($id, $data) {
-        $stmt = $this->db->prepare("UPDATE categorias SET nombre = :nombre, slug = :slug, descripcion = :descripcion, activo = :activo WHERE id = :id");
+        $stmt = $this->db->prepare("UPDATE categorias SET nombre = :nombre, abreviatura = :abreviatura, slug = :slug, descripcion = :descripcion, activo = :activo WHERE id = :id");
         return $stmt->execute([
             ':nombre' => $data['nombre'] ?? '',
             ':slug' => $data['slug'] ?? '',
