@@ -42,6 +42,7 @@ use SellSoft\Helpers\Session;
                 Lang::get('catalog') => [
                     ['url' => '/dashboard/products', 'icon' => 'fa-box-open', 'label' => Lang::get('products')],
                     ['url' => '/dashboard/categories', 'icon' => 'fa-tags', 'label' => Lang::get('categories')],
+                    ['url' => '/dashboard/brands', 'icon' => 'fa-copyright', 'label' => Lang::get('brands') ?? 'Marcas'],
                     ['url' => '/dashboard/offers', 'icon' => 'fa-percent', 'label' => Lang::get('offers')]
                 ],
                 Lang::get('inventory') => [

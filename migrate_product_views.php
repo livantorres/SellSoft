@@ -1,3 +1,5 @@
+<?php
+$indexContent = <<<'HTML'
 <div class="container-fluid px-4 mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800"><?= \SellSoft\Helpers\Lang::get('catalog.products.title') ?? 'Productos' ?></h1>
@@ -349,3 +351,10 @@ function deleteProduct(id) {
     });
 }
 </script>
+HTML;
+
+file_put_contents('resources/views/catalog/products/index.php', $indexContent);
+if(file_exists('resources/views/catalog/products/create.php')) unlink('resources/views/catalog/products/create.php');
+if(file_exists('resources/views/catalog/products/edit.php')) unlink('resources/views/catalog/products/edit.php');
+
+echo "Product views migrated successfully to modal in index.php.\n";

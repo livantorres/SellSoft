@@ -125,4 +125,29 @@ class Product
         $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string)));
         return $slug;
     }
+
+    public function addGalleryImages($productoId, $urls) {
+        if (empty($urls)) return;
+        $sql = "INSERT INTO galeria_productos (producto_id, url_imagen, orden) VALUES (:producto_id, :url_imagen, :orden)";
+        $stmt = $this->db->prepare($sql);
+        foreach ($urls as $index => $url) {
+            $stmt->execute([
+                ':producto_id' => $productoId,
+                ':url_imagen' => $url,
+                ':orden' => $index
+            ]);
+        }
+    }
+    
+    public function getGalleryImages($productoId) {
+        $stmt = $this->db->prepare("SELECT * FROM galeria_productos WHERE producto_id = :id ORDER BY orden ASC");
+        $stmt->execute([':id' => $productoId]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    
+    public function deleteGalleryImages($productoId) {
+        $stmt = $this->db->prepare("DELETE FROM galeria_productos WHERE producto_id = :id");
+        $stmt->execute([':id' => $productoId]);
+    }
+
 }

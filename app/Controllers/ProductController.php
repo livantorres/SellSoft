@@ -20,7 +20,17 @@ class ProductController extends Controller
     public function index()
     {
         $products = $this->productModel->getAll();
-        $this->view('catalog.products.index', ['products' => $products]);
+        $categories = (new Category())->getAll();
+        $brands = (new Brand())->getAll();
+        $providers = (new Provider())->getAll();
+        
+        $this->view('catalog.products.index', [
+            'products' => $products,
+            'categories' => $categories,
+            'brands' => $brands,
+            'providers' => $providers,
+            'title' => Lang::get('catalog.products.title')
+        ]);
     }
 
     public function create() {
@@ -34,23 +44,32 @@ class ProductController extends Controller
         ]);
     }
 
+    
     public function store()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $_POST;
-            
-            // Handle image upload
-            $data['imagen_principal'] = $this->handleImageUpload();
+            $galleryUrls = $this->handleGalleryUpload();
+            if (!empty($galleryUrls)) {
+                $data['imagen_principal'] = $galleryUrls[0];
+            }
 
             try {
-                $this->productModel->create($data);
-                // Redirect on success
-                echo json_encode(['success' => true, 'message' => \SellSoft\Helpers\Lang::get('messages.created_successfully')]);
+                $productoId = $this->productModel->create($data);
+                
+                // Si hay más imágenes para la galería, guardarlas
+                if (!empty($galleryUrls)) {
+                    $this->productModel->addGalleryImages($productoId, $galleryUrls);
+                }
+                
+                echo json_encode(['success' => true, 'message' => \SellSoft\Helpers\Lang::get('messages.created_successfully') ?? 'Guardado con éxito']);
                 exit;
             } catch (\Exception $e) {
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
         }
+    }
+
     }
 
     public function edit($id)
@@ -72,31 +91,37 @@ class ProductController extends Controller
         ]);
     }
 
+    
     public function update()
     {
         $id = $_POST['id'] ?? null;
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID is missing']); return; }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = $_POST;
+            $galleryUrls = $this->handleGalleryUpload();
             
-            $product = $this->productModel->getById($id);
-            if (!$product) {
-                echo json_encode(['success' => true, 'message' => \SellSoft\Helpers\Lang::get('messages.created_successfully')]);
-                exit;
+            // Si subieron nuevas imágenes
+            if (!empty($galleryUrls)) {
+                $data['imagen_principal'] = $galleryUrls[0];
+                $this->productModel->deleteGalleryImages($id);
+                $this->productModel->addGalleryImages($id, $galleryUrls);
+            } else {
+                // Keep the old one
+                $product = $this->productModel->find($id);
+                $data['imagen_principal'] = $product['imagen_principal'] ?? null;
             }
-
-            // Handle image upload
-            $uploadedImage = $this->handleImageUpload();
-            $data['imagen_principal'] = $uploadedImage ? $uploadedImage : $product['imagen_principal'];
 
             try {
                 $this->productModel->update($id, $data);
-                echo json_encode(['success' => true, 'message' => \SellSoft\Helpers\Lang::get('messages.created_successfully')]);
+                echo json_encode(['success' => true, 'message' => \SellSoft\Helpers\Lang::get('messages.updated_successfully') ?? 'Actualizado con éxito']);
                 exit;
             } catch (\Exception $e) {
                 echo json_encode(['success' => false, 'message' => $e->getMessage()]);
             }
         }
+    }
+
     }
 
     public function delete()
@@ -130,4 +155,28 @@ class ProductController extends Controller
         }
         return null;
     }
+
+    protected function handleGalleryUpload()
+    {
+        $urls = [];
+        if (isset($_FILES['galeria']) && is_array($_FILES['galeria']['error'])) {
+            $uploadDir = __DIR__ . '/../../public/storage/products/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            $count = count($_FILES['galeria']['name']);
+            for ($i = 0; $i < $count; $i++) {
+                if ($_FILES['galeria']['error'][$i] === UPLOAD_ERR_OK) {
+                    $fileName = uniqid() . '_' . basename($_FILES['galeria']['name'][$i]);
+                    $uploadFile = $uploadDir . $fileName;
+                    if (move_uploaded_file($_FILES['galeria']['tmp_name'][$i], $uploadFile)) {
+                        $urls[] = 'storage/products/' . $fileName;
+                    }
+                }
+            }
+        }
+        return $urls;
+    }
+
 }
