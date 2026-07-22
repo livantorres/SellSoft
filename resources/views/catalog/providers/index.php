@@ -115,10 +115,7 @@
                   </div>
               </div>
               
-              <div class="mb-3">
-                  <label for="providerImagen" class="form-label">Logo / Fotografía (Opcional)</label>
-                  <input type="file" class="form-control" id="providerImagen" name="imagen" accept="image/*">
-              </div>
+
 <div class="row mb-3">
                   <div class="col-md-6">
                       <label for="providerEmail" class="form-label"><?= \SellSoft\Helpers\Lang::get('common.email') ?></label>
@@ -130,10 +127,7 @@
                   </div>
               </div>
               
-              <div class="mb-3">
-                  <label for="providerImagen" class="form-label">Logo / Fotografía (Opcional)</label>
-                  <input type="file" class="form-control" id="providerImagen" name="imagen" accept="image/*">
-              </div>
+
 <div class="row mb-3">
                   <div class="col-md-6">
                       <label for="providerDepto" class="form-label">Departamento</label>
