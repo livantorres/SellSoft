@@ -63,12 +63,12 @@ class Product
             $initialStock = $data['stock_inicial'] ?? 0;
             $minStock = $data['stock_minimo'] ?? 0;
             
-            $sqlBodega = "INSERT INTO producto_bodega (producto_id, bodega_id, stock, stock_minimo) VALUES (:producto_id, :bodega_id, :stock, :stock_minimo)";
+            $sqlBodega = "INSERT INTO producto_bodega (producto_id, bodega_id, stock_actual, stock_minimo) VALUES (:producto_id, :bodega_id, :stock_actual, :stock_minimo)";
             $stmtBodega = $this->db->prepare($sqlBodega);
             $stmtBodega->execute([
                 ':producto_id'  => $productoId,
                 ':bodega_id'    => $warehouseId,
-                ':stock'        => $initialStock,
+                ':stock_actual' => $initialStock,
                 ':stock_minimo' => $minStock
             ]);
             
