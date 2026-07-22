@@ -61,3 +61,7 @@ $router->get('/lang/{locale}', function ($locale) {
     header('Location: ' . $referer);
     exit;
 });
+
+// API JSON (Ubicaciones)
+$router->add('GET', '/api/departamentos', [\SellSoft\Controllers\LocationController::class, 'getDepartamentos']);
+$router->add('GET', '/api/ciudades', [\SellSoft\Controllers\LocationController::class, 'getCiudades']);
