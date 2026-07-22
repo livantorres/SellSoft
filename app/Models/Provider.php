@@ -29,8 +29,8 @@ class Provider
 
     public function create($data)
     {
-        $stmt = $this->db->prepare("INSERT INTO proveedores (nombre, tipo_documento, nit, contacto, telefono, correo, direccion, ciudad_id, activo) VALUES (:nombre, :tipo_documento, :nit, :contacto, :telefono, :correo, :direccion, :ciudad_id, :activo)");
-        return $stmt->execute([
+        $stmt = $this->db->prepare("INSERT INTO proveedores (nombre, tipo_documento, nit, contacto, telefono, correo, direccion, ciudad_id, imagen, is_cliente, activo) VALUES (:nombre, :tipo_documento, :nit, :contacto, :telefono, :correo, :direccion, :ciudad_id, :imagen, :is_cliente, :activo)");
+        $stmt->execute([
             ':nombre' => $data['nombre'] ?? '',
             ':tipo_documento' => $data['tipo_documento'] ?? 'NIT',
             ':nit' => $data['nit'] ?? null,
@@ -39,13 +39,16 @@ class Provider
             ':correo' => $data['correo'] ?? null,
             ':direccion' => $data['direccion'] ?? null,
             ':ciudad_id' => !empty($data['ciudad_id']) ? $data['ciudad_id'] : null,
+            ':imagen' => $data['imagen'] ?? null,
+            ':is_cliente' => $data['is_cliente'] ?? 0,
             ':activo' => $data['activo'] ?? 1
         ]);
+        return $this->db->lastInsertId();
     }
 
     public function update($id, $data) {
-        $stmt = $this->db->prepare("UPDATE proveedores SET nombre = :nombre, tipo_documento = :tipo_documento, nit = :nit, contacto = :contacto, telefono = :telefono, correo = :correo, direccion = :direccion, ciudad_id = :ciudad_id, activo = :activo WHERE id = :id");
-        return $stmt->execute([
+        $query = "UPDATE proveedores SET nombre = :nombre, tipo_documento = :tipo_documento, nit = :nit, contacto = :contacto, telefono = :telefono, correo = :correo, direccion = :direccion, ciudad_id = :ciudad_id, is_cliente = :is_cliente, activo = :activo";
+        $params = [
             ':nombre' => $data['nombre'] ?? '',
             ':tipo_documento' => $data['tipo_documento'] ?? 'NIT',
             ':nit' => $data['nit'] ?? null,
@@ -54,9 +57,20 @@ class Provider
             ':correo' => $data['correo'] ?? null,
             ':direccion' => $data['direccion'] ?? null,
             ':ciudad_id' => !empty($data['ciudad_id']) ? $data['ciudad_id'] : null,
+            ':is_cliente' => $data['is_cliente'] ?? 0,
             ':activo' => $data['activo'] ?? 1,
             ':id' => $id
-        ]);
+        ];
+
+        if (isset($data['imagen'])) {
+            $query .= ", imagen = :imagen";
+            $params[':imagen'] = $data['imagen'];
+        }
+
+        $query .= " WHERE id = :id";
+        
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute($params);
     }
 
     public function delete($id)

@@ -31,9 +31,25 @@ class ProviderController extends Controller
 
     public function store()
     {
-        $data = ['nombre' => $_POST['name'] ?? '', 'tipo_documento' => $_POST['tipo_documento'] ?? 'NIT', 'nit' => $_POST['nit'] ?? null, 'correo' => $_POST['email'] ?? null, 'telefono' => $_POST['phone'] ?? null, 'direccion' => $_POST['address'] ?? null, 'contacto' => $_POST['contact'] ?? null, 'ciudad_id' => $_POST['ciudad_id'] ?? null, 'activo' => $_POST['status'] ?? 1];
+        $data = $_POST;
         
-        if ($this->providerModel->create($data)) {
+        // Handle file upload
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('prov_') . '.' . $ext;
+            $dest = __DIR__ . '/../../public/uploads/providers/';
+            if (!is_dir($dest)) mkdir($dest, 0777, true);
+            move_uploaded_file($_FILES['imagen']['tmp_name'], $dest . $filename);
+            $data['imagen'] = '/uploads/providers/' . $filename;
+        }
+
+        $data['is_cliente'] = isset($_POST['is_cliente']) ? 1 : 0;
+        
+        $provId = $this->providerModel->create($data);
+        if ($provId) {
+            if ($data['is_cliente']) {
+                $this->syncCliente($provId, $data);
+            }
             echo json_encode(['success' => true, 'message' => Lang::get('messages.created_successfully')]);
         } else {
             echo json_encode(['success' => false, 'message' => Lang::get('messages.error_creating')]);
@@ -44,15 +60,78 @@ class ProviderController extends Controller
     {
         $id = $_POST['id'] ?? null;
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID is missing']); return; }
-        $data = ['nombre' => $_POST['name'] ?? '', 'tipo_documento' => $_POST['tipo_documento'] ?? 'NIT', 'nit' => $_POST['nit'] ?? null, 'correo' => $_POST['email'] ?? null, 'telefono' => $_POST['phone'] ?? null, 'direccion' => $_POST['address'] ?? null, 'contacto' => $_POST['contact'] ?? null, 'ciudad_id' => $_POST['ciudad_id'] ?? null, 'activo' => $_POST['status'] ?? 1];
+        
+        $data = $_POST;
         if (empty($data)) {
-            $data = json_decode(file_get_contents('php://input'), true) ?? []; if(isset($data['name'])) { $data = ['nombre' => $data['name'], 'tipo_documento' => $data['tipo_documento'] ?? 'NIT', 'nit' => $data['nit'] ?? null, 'correo' => $data['email'] ?? null, 'telefono' => $data['phone'] ?? null, 'direccion' => $data['address'] ?? null, 'contacto' => $data['contact'] ?? null, 'ciudad_id' => $data['ciudad_id'] ?? null, 'activo' => $data['status'] ?? 1]; }
+            $data = json_decode(file_get_contents('php://input'), true) ?? [];
+        }
+        
+        // Handle file upload
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            $ext = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+            $filename = uniqid('prov_') . '.' . $ext;
+            $dest = __DIR__ . '/../../public/uploads/providers/';
+            if (!is_dir($dest)) mkdir($dest, 0777, true);
+            move_uploaded_file($_FILES['imagen']['tmp_name'], $dest . $filename);
+            $data['imagen'] = '/uploads/providers/' . $filename;
         }
 
+        $data['is_cliente'] = isset($_POST['is_cliente']) ? 1 : 0;
+
         if ($this->providerModel->update($id, $data)) {
+            if ($data['is_cliente']) {
+                $this->syncCliente($id, $data);
+            }
             echo json_encode(['success' => true, 'message' => Lang::get('messages.updated_successfully')]);
         } else {
             echo json_encode(['success' => false, 'message' => Lang::get('messages.error_updating')]);
+        }
+    }
+
+    private function syncCliente($providerId, $data) {
+        $db = \SellSoft\Core\Database::getInstance()->getPdo();
+        
+        // Map tipo_documento to clientes ENUM
+        $tipoMap = [
+            'NIT' => 'NIT',
+            'CC' => 'CC',
+            'CE' => 'CE',
+            'PASAPORTE' => 'PAS',
+            'RUT' => 'NIT'
+        ];
+        $tipoDoc = $tipoMap[$data['tipo_documento'] ?? 'NIT'] ?? 'NIT';
+        
+        // Find existing client linked to this provider
+        $stmt = $db->prepare("SELECT id FROM clientes WHERE proveedor_id = ?");
+        $stmt->execute([$providerId]);
+        $clienteId = $stmt->fetchColumn();
+        
+        $nombre = $data['name'] ?? $data['nombre'] ?? '';
+        
+        if ($clienteId) {
+            // Update
+            $update = $db->prepare("UPDATE clientes SET nombre = ?, tipo_doc = ?, numero_doc = ?, correo = ?, telefono = ?, direccion = ? WHERE id = ?");
+            $update->execute([
+                $nombre,
+                $tipoDoc,
+                $data['nit'] ?? '',
+                $data['email'] ?? $data['correo'] ?? '',
+                $data['phone'] ?? $data['telefono'] ?? '',
+                $data['address'] ?? $data['direccion'] ?? '',
+                $clienteId
+            ]);
+        } else {
+            // Insert
+            $insert = $db->prepare("INSERT INTO clientes (proveedor_id, nombre, tipo_doc, numero_doc, correo, telefono, direccion) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $insert->execute([
+                $providerId,
+                $nombre,
+                $tipoDoc,
+                $data['nit'] ?? '',
+                $data['email'] ?? $data['correo'] ?? '',
+                $data['phone'] ?? $data['telefono'] ?? '',
+                $data['address'] ?? $data['direccion'] ?? ''
+            ]);
         }
     }
 

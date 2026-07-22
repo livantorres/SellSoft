@@ -22,24 +22,48 @@
                     </thead>
                     <tbody>
                         <?php if(!empty($providers)): ?>
-                            <?php foreach($providers as $provider): ?>
+                            <?php foreach($providers as $p): ?>
                             <tr>
-                                <td><?= htmlspecialchars((string)($provider['id'] ?? '')) ?></td>
-                                <td><?= htmlspecialchars((string)($provider['nombre'] ?? '')) ?></td>
-                                <td><?= htmlspecialchars((string)($provider['correo'] ?? '')) ?></td>
-                                <td><?= htmlspecialchars((string)($provider['telefono'] ?? '')) ?></td>
+                                <td><?= htmlspecialchars((string)($p['id'] ?? '')) ?></td>
                                 <td>
-                                    <?php if(isset($provider['activo']) && $provider['activo'] == 1): ?>
+                                    <div class="d-flex align-items-center">
+                                        <?php if(!empty($p['imagen'])): ?>
+                                            <img src="<?= APP_URL . htmlspecialchars($p['imagen']) ?>" alt="Logo" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                        <?php else: ?>
+                                            <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white me-2" style="width: 40px; height: 40px;">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                        <?php endif; ?>
+                                        <div>
+                                            <?= htmlspecialchars((string)($p['nombre'] ?? '')) ?>
+                                            <?php if(isset($p['is_cliente']) && $p['is_cliente']): ?>
+                                                <br><span class="badge bg-info text-dark" style="font-size: 0.65rem;">También Cliente</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><?= htmlspecialchars((string)($p['correo'] ?? '')) ?></td>
+                                <td><?= htmlspecialchars((string)($p['telefono'] ?? '')) ?></td>
+                                <td>
+                                    <small class="text-muted"><?= htmlspecialchars($p['tipo_documento'] ?? 'NIT') ?></small><br>
+                                    <b><?= htmlspecialchars($p['nit'] ?? '') ?></b>
+                                </td>
+                                <td>
+                                    <small><?= htmlspecialchars($p['ciudad_nombre'] ?? '') ?><br>
+                                    <span class="text-muted"><?= htmlspecialchars($p['departamento_nombre'] ?? '') ?></span></small>
+                                </td>
+                                <td>
+                                    <?php if(isset($p['activo']) && $p['activo'] == 1): ?>
                                         <span class="badge bg-success"><?= \SellSoft\Helpers\Lang::get('common.active') ?></span>
                                     <?php else: ?>
                                         <span class="badge bg-danger"><?= \SellSoft\Helpers\Lang::get('common.inactive') ?></span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-info text-white" onclick='editProvider(<?= json_encode($provider) ?>)'>
+                                    <button class="btn btn-sm btn-info text-white" onclick='editProvider(<?= json_encode($p) ?>)'>
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-danger" onclick='deleteProvider(<?= htmlspecialchars((string)($provider['id'] ?? '')) ?>)'>
+                                    <button class="btn btn-sm btn-danger" onclick='deleteProvider(<?= htmlspecialchars((string)($p['id'] ?? '')) ?>)'>
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -57,7 +81,7 @@
 <div class="modal fade" id="providerModal" tabindex="-1" aria-labelledby="providerModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="providerForm" action="/dashboard/providers" method="POST">
+      <form id="providerForm" action="/dashboard/providers" method="POST" enctype="multipart/form-data">
           <?= \SellSoft\Helpers\Csrf::field() ?>
           <input type="hidden" name="id" id="providerId">
           <div class="modal-header">
@@ -69,7 +93,12 @@
                   <label for="providerName" class="form-label"><?= \SellSoft\Helpers\Lang::get('common.name') ?> *</label>
                   <input type="text" class="form-control" id="providerName" name="name" required>
               </div>
-              <div class="row mb-3">
+              
+              <div class="mb-3">
+                  <label for="providerImagen" class="form-label">Logo / Fotografía (Opcional)</label>
+                  <input type="file" class="form-control" id="providerImagen" name="imagen" accept="image/*">
+              </div>
+<div class="row mb-3">
                   <div class="col-md-4">
                       <label for="providerTipoDoc" class="form-label">Tipo Documento</label>
                       <select class="form-select" id="providerTipoDoc" name="tipo_documento">
@@ -85,7 +114,12 @@
                       <input type="text" class="form-control" id="providerNit" name="nit">
                   </div>
               </div>
-              <div class="row mb-3">
+              
+              <div class="mb-3">
+                  <label for="providerImagen" class="form-label">Logo / Fotografía (Opcional)</label>
+                  <input type="file" class="form-control" id="providerImagen" name="imagen" accept="image/*">
+              </div>
+<div class="row mb-3">
                   <div class="col-md-6">
                       <label for="providerEmail" class="form-label"><?= \SellSoft\Helpers\Lang::get('common.email') ?></label>
                       <input type="email" class="form-control" id="providerEmail" name="email">
@@ -95,7 +129,12 @@
                       <input type="text" class="form-control" id="providerPhone" name="phone">
                   </div>
               </div>
-              <div class="row mb-3">
+              
+              <div class="mb-3">
+                  <label for="providerImagen" class="form-label">Logo / Fotografía (Opcional)</label>
+                  <input type="file" class="form-control" id="providerImagen" name="imagen" accept="image/*">
+              </div>
+<div class="row mb-3">
                   <div class="col-md-6">
                       <label for="providerDepto" class="form-label">Departamento</label>
                       <select class="form-select" id="providerDepto" onchange="loadCities(this.value)">
@@ -123,7 +162,12 @@
                       <option value="0"><?= \SellSoft\Helpers\Lang::get('common.inactive') ?></option>
                   </select>
               </div>
-          </div>
+          
+              <div class="mb-3 form-check form-switch">
+                  <input class="form-check-input" type="checkbox" role="switch" id="providerIsCliente" name="is_cliente" value="1">
+                  <label class="form-check-label" for="providerIsCliente"><strong>Es también cliente</strong> (Creará un registro en Clientes vinculado a este Proveedor)</label>
+              </div>
+</div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary-app" data-bs-dismiss="modal"><?= \SellSoft\Helpers\Lang::get('common.cancel') ?></button>
             <button type="submit" class="btn btn-primary-app"><?= \SellSoft\Helpers\Lang::get('common.save') ?></button>
@@ -143,6 +187,7 @@ function editProvider(provider) {
     document.getElementById('providerPhone').value = provider.telefono || '';
     document.getElementById('providerAddress').value = provider.direccion || '';
     document.getElementById('providerStatus').value = (provider.activo !== undefined) ? provider.activo : 1;
+    document.getElementById('providerIsCliente').checked = (provider.is_cliente == 1);
     
     // Set dept and load cities
     if(provider.departamento_id) {
