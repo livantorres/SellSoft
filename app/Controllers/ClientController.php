@@ -152,7 +152,16 @@ class ClientController extends Controller
     {
         $id = $_POST['id'] ?? null;
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID is missing']); return; }
+        
+        $db = \SellSoft\Core\Database::getInstance()->getPdo();
+        $stmt = $db->prepare("SELECT proveedor_id FROM clientes WHERE id = ?");
+        $stmt->execute([$id]);
+        $proveedorId = $stmt->fetchColumn();
+
         if ($this->clientModel->delete($id)) {
+            if ($proveedorId) {
+                $db->prepare("UPDATE proveedores SET is_cliente = 0 WHERE id = ?")->execute([$proveedorId]);
+            }
             echo json_encode(['success' => true, 'message' => Lang::get('messages.deleted_successfully')]);
         } else {
             echo json_encode(['success' => false, 'message' => Lang::get('messages.error_deleting')]);

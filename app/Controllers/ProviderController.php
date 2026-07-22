@@ -162,7 +162,11 @@ class ProviderController extends Controller
     {
         $id = $_POST['id'] ?? null;
         if (!$id) { echo json_encode(['success' => false, 'message' => 'ID is missing']); return; }
+        
+        $db = \SellSoft\Core\Database::getInstance()->getPdo();
+
         if ($this->providerModel->delete($id)) {
+            $db->prepare("UPDATE clientes SET is_proveedor = 0, proveedor_id = NULL WHERE proveedor_id = ?")->execute([$id]);
             echo json_encode(['success' => true, 'message' => Lang::get('messages.deleted_successfully')]);
         } else {
             echo json_encode(['success' => false, 'message' => Lang::get('messages.error_deleting')]);
