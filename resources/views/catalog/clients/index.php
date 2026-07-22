@@ -160,22 +160,22 @@
 </div>
 
 <script>
-function editClient(provider) {
-    document.getElementById('clientId').value = provider.id || '';
-    document.getElementById('providerName').value = provider.nombre || '';
-    document.getElementById('providerTipoDoc').value = provider.tipo_documento || 'NIT';
-    document.getElementById('providerNit').value = provider.nit || '';
-    document.getElementById('providerEmail').value = provider.correo || '';
-    document.getElementById('providerPhone').value = provider.telefono || '';
-    document.getElementById('providerAddress').value = provider.direccion || '';
-    document.getElementById('providerStatus').value = (provider.activo !== undefined) ? provider.activo : 1;
-    document.getElementById('providerIsCliente').checked = (provider.is_cliente == 1);
+function editClient(client) {
+    document.getElementById('clientId').value = client.id || '';
+    document.getElementById('clientName').value = client.nombre || '';
+    document.getElementById('clientTipoDoc').value = client.tipo_doc || 'CC';
+    document.getElementById('clientNit').value = client.numero_doc || '';
+    document.getElementById('clientEmail').value = client.correo || '';
+    document.getElementById('clientPhone').value = client.telefono || '';
+    document.getElementById('clientAddress').value = client.direccion || '';
+    document.getElementById('clientStatus').value = (client.activo !== undefined) ? client.activo : 1;
+    document.getElementById('clientIsProveedor').checked = (client.is_proveedor == 1);
     
     // Set dept and load cities
-    if(provider.departamento_id) {
-        $('#clientDepto').val(provider.departamento_id).trigger('change');
+    if(client.departamento_id) {
+        $('#clientDepto').val(client.departamento_id).trigger('change');
         // Wait for ajax to load cities then set value
-        loadCities(provider.departamento_id, provider.ciudad_id);
+        loadCities(client.departamento_id, client.ciudad_id);
     } else {
         $('#clientDepto').val('').trigger('change');
         $('#clientCiudad').empty().append('<option value="">Seleccione...</option>').trigger('change');
