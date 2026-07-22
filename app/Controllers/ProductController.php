@@ -6,6 +6,7 @@ use SellSoft\Models\Product;
 use SellSoft\Models\Category;
 use SellSoft\Models\Brand;
 use SellSoft\Models\Provider;
+use SellSoft\Helpers\Lang;
 
 use SellSoft\Core\Controller;
 class ProductController extends Controller
