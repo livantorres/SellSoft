@@ -169,7 +169,18 @@ function editClient(client) {
     document.getElementById('clientPhone').value = client.telefono || '';
     document.getElementById('clientAddress').value = client.direccion || '';
     document.getElementById('clientStatus').value = (client.activo !== undefined) ? client.activo : 1;
-    document.getElementById('clientIsProveedor').checked = (client.is_proveedor == 1);
+    
+    const isProveedorChk = document.getElementById('clientIsProveedor');
+    isProveedorChk.checked = (client.is_proveedor == 1);
+    if(client.is_proveedor == 1) {
+        isProveedorChk.onclick = function() { return false; };
+        isProveedorChk.style.opacity = 0.5;
+        isProveedorChk.title = "Ya está vinculado como proveedor, no se puede desvincular.";
+    } else {
+        isProveedorChk.onclick = null;
+        isProveedorChk.style.opacity = 1;
+        isProveedorChk.title = "";
+    }
     
     // Set dept and load cities
     if(client.departamento_id) {
@@ -219,6 +230,10 @@ function resetClientForm() {
     document.getElementById('clientForm').reset();
     $('#clientForm select').val('').trigger('change');
     document.getElementById('clientId').value = '';
+    const isProveedorChk = document.getElementById('clientIsProveedor');
+    isProveedorChk.onclick = null;
+    isProveedorChk.style.opacity = 1;
+    isProveedorChk.title = "";
     document.getElementById('clientModalLabel').innerText = 'Nuevo Cliente';
 }
 

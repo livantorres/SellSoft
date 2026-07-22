@@ -196,7 +196,17 @@ function editProvider(provider) {
         previewContainer.style.display = 'none';
     }
     document.getElementById('providerStatus').value = (provider.activo !== undefined) ? provider.activo : 1;
-    document.getElementById('providerIsCliente').checked = (provider.is_cliente == 1);
+    const isClienteChk = document.getElementById('providerIsCliente');
+    isClienteChk.checked = (provider.is_cliente == 1);
+    if(provider.is_cliente == 1) {
+        isClienteChk.onclick = function() { return false; };
+        isClienteChk.style.opacity = 0.5;
+        isClienteChk.title = "Ya está vinculado como cliente, no se puede desvincular.";
+    } else {
+        isClienteChk.onclick = null;
+        isClienteChk.style.opacity = 1;
+        isClienteChk.title = "";
+    }
     
     // Set dept and load cities
     if(provider.departamento_id) {
@@ -248,6 +258,10 @@ function resetProviderForm() {
     document.getElementById('providerId').value = '';
     document.getElementById('providerImagePreviewContainer').style.display = 'none';
     document.getElementById('providerImagePreview').src = '';
+    const isClienteChk = document.getElementById('providerIsCliente');
+    isClienteChk.onclick = null;
+    isClienteChk.style.opacity = 1;
+    isClienteChk.title = "";
     document.getElementById('providerModalLabel').innerText = '<?= \SellSoft\Helpers\Lang::get('catalog.providers.create') ?>';
 }
 
