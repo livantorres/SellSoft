@@ -53,6 +53,10 @@ $router->group(['prefix' => '/api', 'middleware' => [AuthMiddleware::class]], fu
         echo json_encode(['status' => 'ok', 'time' => date('H:i:s'), 'timezone' => TIMEZONE]);
         exit;
     });
+    
+    // Ubicaciones
+    $r->get('/departamentos', [\SellSoft\Controllers\LocationController::class, 'getDepartamentos']);
+    $r->get('/ciudades', [\SellSoft\Controllers\LocationController::class, 'getCiudades']);
 });
 
 $router->get('/lang/{locale}', function ($locale) {
@@ -62,6 +66,4 @@ $router->get('/lang/{locale}', function ($locale) {
     exit;
 });
 
-// API JSON (Ubicaciones)
-$router->add('GET', '/api/departamentos', [\SellSoft\Controllers\LocationController::class, 'getDepartamentos']);
-$router->add('GET', '/api/ciudades', [\SellSoft\Controllers\LocationController::class, 'getCiudades']);
+// End routes
