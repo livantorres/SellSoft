@@ -50,6 +50,7 @@ $router->group(['prefix' => '/dashboard', 'middleware' => [AuthMiddleware::class
     $r->get('/products/{id}/edit',[\SellSoft\Controllers\ProductController::class, 'edit']);
     $r->post('/products/update',  [\SellSoft\Controllers\ProductController::class, 'update']);
     $r->post('/products/delete',  [\SellSoft\Controllers\ProductController::class, 'delete']);
+    $r->get('/products/gallery',  [\SellSoft\Controllers\ProductController::class, 'getGallery']);
 });
 
 $router->group(['prefix' => '/api', 'middleware' => [AuthMiddleware::class]], function ($r) {

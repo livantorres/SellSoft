@@ -247,6 +247,20 @@ function editProduct(prod) {
     if(compra > 0) {
         document.getElementById('prodMargin').value = ((venta - compra) / compra * 100).toFixed(1);
     }
+    // Fetch gallery
+    fetch('/dashboard/products/gallery?id=' + prod.id)
+        .then(res => res.json())
+        .then(data => {
+            if(data.success && data.gallery) {
+                productImages = data.gallery.map(img => ({
+                    isExisting: true,
+                    url: '/' + img.url_imagen,
+                    path: img.url_imagen,
+                    id: img.id
+                }));
+                renderGallery();
+            }
+        });
     
     var modal = new bootstrap.Modal(document.getElementById('productModal'));
     modal.show();
@@ -275,26 +289,38 @@ function renderGallery() {
     preview.innerHTML = '';
     
     productImages.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const col = document.createElement('div');
-            col.className = 'col-4 col-md-4 position-relative gallery-item';
-            col.dataset.index = index;
-            
-            const badge = index === 0 ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.6rem; z-index: 2;">Ppal</span>' : '';
-            const delBtn = `<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 p-0 rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 20px; height: 20px; z-index: 2;" onclick="removeImage(${index})" title="Eliminar"><i class="fas fa-times" style="font-size: 0.6rem;"></i></button>`;
-            
+        const col = document.createElement('div');
+        col.className = 'col-4 col-md-4 position-relative gallery-item';
+        col.dataset.index = index;
+        
+        const badge = index === 0 ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1" style="font-size:0.6rem; z-index: 2;">Ppal</span>' : '';
+        const delBtn = `<button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 p-0 rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 20px; height: 20px; z-index: 2;" onclick="removeImage(${index})" title="Eliminar"><i class="fas fa-times" style="font-size: 0.6rem;"></i></button>`;
+        
+        if (file.isExisting) {
             col.innerHTML = `
                 <div class="border rounded overflow-hidden shadow-sm position-relative drag-handle" style="aspect-ratio: 1/1; cursor: grab;">
                     ${badge}
                     ${delBtn}
-                    <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover;" onclick="previewFull('${e.target.result}')">
+                    <img src="${file.url}" class="w-100 h-100" style="object-fit: cover;" onclick="previewFull('${file.url}')">
      <div class="position-absolute bottom-0 end-0 m-1 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center opacity-75" style="width: 20px; height: 20px; pointer-events: none;"><i class="fas fa-search-plus" style="font-size: 0.6rem;"></i></div>
                 </div>
             `;
             preview.appendChild(col);
+        } else {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                col.innerHTML = `
+                    <div class="border rounded overflow-hidden shadow-sm position-relative drag-handle" style="aspect-ratio: 1/1; cursor: grab;">
+                        ${badge}
+                        ${delBtn}
+                        <img src="${e.target.result}" class="w-100 h-100" style="object-fit: cover;" onclick="previewFull('${e.target.result}')">
+         <div class="position-absolute bottom-0 end-0 m-1 bg-dark text-white rounded-circle d-flex align-items-center justify-content-center opacity-75" style="width: 20px; height: 20px; pointer-events: none;"><i class="fas fa-search-plus" style="font-size: 0.6rem;"></i></div>
+                    </div>
+                `;
+                preview.appendChild(col);
+            }
+            reader.readAsDataURL(file);
         }
-        reader.readAsDataURL(file);
     });
     
     if (!sortableGallery) {
@@ -321,8 +347,13 @@ document.getElementById('productForm').addEventListener('submit', async function
     const form = e.target;
     const formData = new FormData(form);
     formData.delete('galeria[]');
-    productImages.forEach(file => {
-        formData.append('galeria[]', file);
+    formData.delete('existing_gallery[]');
+    productImages.forEach(item => {
+        if (item.isExisting) {
+            formData.append('existing_gallery[]', item.path);
+        } else {
+            formData.append('galeria[]', item);
+        }
     });
     const id = formData.get('id');
     const endpoint = id ? '/dashboard/products/update' : '/dashboard/products';

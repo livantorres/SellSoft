@@ -100,15 +100,17 @@ class ProductController extends Controller
             $data = $_POST;
             $galleryUrls = $this->handleGalleryUpload();
             
-            // Si subieron nuevas imágenes
-            if (!empty($galleryUrls)) {
-                $data['imagen_principal'] = $galleryUrls[0];
+            // Combinar galería existente y nueva
+            $existingGallery = $_POST['existing_gallery'] ?? [];
+            $allUrls = array_merge($existingGallery, $galleryUrls);
+            
+            if (!empty($allUrls)) {
+                $data['imagen_principal'] = $allUrls[0];
                 $this->productModel->deleteGalleryImages($id);
-                $this->productModel->addGalleryImages($id, $galleryUrls);
+                $this->productModel->addGalleryImages($id, $allUrls);
             } else {
-                // Keep the old one
-                $product = $this->productModel->find($id);
-                $data['imagen_principal'] = $product['imagen_principal'] ?? null;
+                $data['imagen_principal'] = null;
+                $this->productModel->deleteGalleryImages($id);
             }
 
             try {
@@ -213,6 +215,19 @@ class ProductController extends Controller
         $newSku = $abrev . '-' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
         
         echo json_encode(['success' => true, 'sku' => $newSku]);
+        exit;
+    }
+
+
+    public function getGallery()
+    {
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $gallery = $this->productModel->getGalleryImages($id);
+            echo json_encode(['success' => true, 'gallery' => $gallery]);
+        } else {
+            echo json_encode(['success' => false]);
+        }
         exit;
     }
 
