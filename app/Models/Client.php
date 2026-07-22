@@ -16,7 +16,7 @@ class Client
 
     public function getAll()
     {
-        $stmt = $this->db->query("SELECT cl.*, c.nombre as ciudad_nombre, d.nombre as departamento_nombre 
+        $stmt = $this->db->query("SELECT cl.*, c.nombre as ciudad_nombre, c.departamento_id, d.nombre as departamento_nombre 
                                   FROM clientes cl 
                                   LEFT JOIN ciudades c ON cl.ciudad_id = c.id 
                                   LEFT JOIN departamentos d ON c.departamento_id = d.id 

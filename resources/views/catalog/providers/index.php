@@ -96,7 +96,11 @@
               
               <div class="mb-3">
                   <label for="providerImagen" class="form-label">Logo / Fotografía (Opcional)</label>
-                  <input type="file" class="form-control" id="providerImagen" name="imagen" accept="image/*">
+                  <div id="providerImagePreviewContainer" style="display: none; margin-bottom: 10px;">
+                      <img id="providerImagePreview" src="" alt="Vista previa" class="img-thumbnail" style="max-height: 100px; cursor: pointer;" onclick="previewImageLarge(this.src)">
+                      <div class="text-muted" style="font-size: 0.8rem;">Clic en la imagen para ampliar</div>
+                  </div>
+                  <input type="file" class="form-control" id="providerImagen" name="imagen" accept="image/*" onchange="previewImageFile(this)">
               </div>
 <div class="row mb-3">
                   <div class="col-md-4">
@@ -180,6 +184,17 @@ function editProvider(provider) {
     document.getElementById('providerEmail').value = provider.correo || '';
     document.getElementById('providerPhone').value = provider.telefono || '';
     document.getElementById('providerAddress').value = provider.direccion || '';
+    
+    // Preview image
+    var previewContainer = document.getElementById('providerImagePreviewContainer');
+    var previewImg = document.getElementById('providerImagePreview');
+    if(provider.imagen) {
+        previewImg.src = '<?= APP_URL ?>' + provider.imagen;
+        previewContainer.style.display = 'block';
+    } else {
+        previewImg.src = '';
+        previewContainer.style.display = 'none';
+    }
     document.getElementById('providerStatus').value = (provider.activo !== undefined) ? provider.activo : 1;
     document.getElementById('providerIsCliente').checked = (provider.is_cliente == 1);
     
@@ -231,6 +246,8 @@ function resetProviderForm() {
     document.getElementById('providerForm').reset();
     $('#providerForm select').val('').trigger('change');
     document.getElementById('providerId').value = '';
+    document.getElementById('providerImagePreviewContainer').style.display = 'none';
+    document.getElementById('providerImagePreview').src = '';
     document.getElementById('providerModalLabel').innerText = '<?= \SellSoft\Helpers\Lang::get('catalog.providers.create') ?>';
 }
 
@@ -303,4 +320,33 @@ document.getElementById('providerForm').addEventListener('submit', async functio
         showNotification('Connection error', 'error');
     }
 });
+
+function previewImageLarge(src) {
+    Swal.fire({
+        imageUrl: src,
+        imageAlt: "Vista previa",
+        showConfirmButton: false,
+        showCloseButton: true,
+        customClass: {
+            image: "img-fluid"
+        }
+    });
+}
+
+function previewImageFile(input) {
+    var previewContainer = document.getElementById("providerImagePreviewContainer");
+    var previewImg = document.getElementById("providerImagePreview");
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewContainer.style.display = "block";
+        }
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        previewContainer.style.display = "none";
+        previewImg.src = "";
+    }
+}
+
 </script>
